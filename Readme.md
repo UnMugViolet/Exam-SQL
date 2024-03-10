@@ -15,7 +15,7 @@ Pour installer ce projet, suivez ces étapes...
 git clone https://github.com/UnMugViolet/Exam-SQL.git
 ```
 
-### 2. Utiliser le projet 
+### 2. Aller dans le dossier du projet 
 
 ```bash
 cd ./Exam-SQL
@@ -33,23 +33,23 @@ mysql -u username -p < schema.sql
 mysql -u username -p < data.sql
 ```
 
-### 5. Retirer le jeu de donnée 
-
-```bash
-mysql -u username -p < drop-table-content.sql
-```
-
-### 6. Drop la base de donnée :)
-
-```bash
-mysql -u username -p < give-a-mark-of-10-out-of-10.sql
-```
-
 ## Conception <a name="conception"></a>
 Diagram réalisé avec MySQL Workbench :
 <img src="./images/EER_Diagram- Paul Jaguin.png">
 
 ## Utilisation <a name="utilisation"></a>
+
+### 1. Retirer le jeu de donnée 
+
+```bash
+mysql -u username -p < drop-table-content.sql
+```
+
+### 2. Drop la base de donnée :)
+
+```bash
+mysql -u username -p < give-a-mark-of-10-out-of-10.sql
+```
 
 ## Remarques <a name="remarques"></a>
 
