@@ -287,21 +287,9 @@ CREATE INDEX `fk_visitor_has_movie_screening_visitor1_idx` ON `exam_sql_paul_jag
 CREATE INDEX `fk_visitor_has_movie_screening_price_category1_idx` ON `exam_sql_paul_jaguin`.`visitor_has_movie_screening` (`price_category_id` ASC) VISIBLE;
 
 USE `exam_sql_paul_jaguin`;
-
-DELIMITER $$
-
-USE `exam_sql_paul_jaguin`$$
-DROP TRIGGER IF EXISTS `exam_sql_paul_jaguin`.`licence_BEFORE_INSERT` $$
-USE `exam_sql_paul_jaguin`$$
-CREATE DEFINER = CURRENT_USER TRIGGER `exam_sql_paul_jaguin`.`licence_BEFORE_INSERT` BEFORE INSERT ON `licence` FOR EACH ROW
-BEGIN
-	IF NEW.date_end_exploitation IS NULL THEN
-        SET NEW.date_end_exploitation = DATE_ADD(NEW.date_begin_exploitation, INTERVAL 8 WEEK);
-    END IF;
-END;$$
-
-
-DELIMITER ;
+DROP TRIGGER IF EXISTS `exam_sql_paul_jaguin`.`licence_BEFORE_INSERT`;
+USE `exam_sql_paul_jaguin`;
+CREATE DEFINER = CURRENT_USER TRIGGER `exam_sql_paul_jaguin`.`licence_BEFORE_INSERT` BEFORE INSERT ON `licence` FOR EACH ROW BEGIN IF NEW.date_end_exploitation IS NULL THEN SET NEW.date_end_exploitation = DATE_ADD(NEW.date_begin_exploitation, INTERVAL 8 WEEK); END IF; END;
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
