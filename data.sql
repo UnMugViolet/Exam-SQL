@@ -60,6 +60,16 @@ VALUES
 ('20:00:00', 'Soirée'),
 ('22:00:00', 'Nuit');
 
+/*
+Add some sessions to the cinema room
+*/
+INSERT INTO `session_has_movie_screening` (`session_id`, `cinema_room_id`, `is_weekday`)
+VALUES
+(1, 1, 0),
+(2, 1, 0),
+(3, 2, 0),
+(4, 2, 0),
+(5, 3, 1);
 
 /*
 Add the data related to the movies in the database link with the director and the authorization scale
@@ -75,7 +85,7 @@ VALUES
 /*
 Add the data for movie screening
 */
-INSERT INTO `movie_screening` (`id`,`is_preview`, `day_screening_id`, `language_id`, `session_id`, `cinema_room_id`, `movie_id`)
+INSERT INTO `movie_screening` (`id`,`is_preview`, `day_screening_id`, `language_id`, `session_has_movie_screening_session_id`, `session_has_movie_screening_cinema_room_id`, `movie_id`)
 VALUES
 (1, 0, 1, 1, 1, 1, 1),
 (2, 0, 1, 2, 2, 1, 2),
