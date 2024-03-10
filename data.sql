@@ -1,4 +1,4 @@
-USE `mcd - sql exam`;
+USE `exam_sql_paul_jaguin`;
 
 /*
 Add the data related to the licence in the database
