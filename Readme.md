@@ -9,7 +9,41 @@
 ## Installation <a name="installation"></a>
 Pour installer ce projet, suivez ces étapes...
 
+### 1. Cloner le repo
 
+```bash
+git clone https://github.com/UnMugViolet/Exam-SQL.git
+```
+
+### 2. Utiliser le projet 
+
+```bash
+cd ./Exam-SQL
+```
+
+### 3. Créer la structure de base de donnée
+
+```bash
+mysql -u username -p < schema.sql
+```
+
+### 4. Insérer le jeu de donnée dans la base de donnée
+
+```bash
+mysql -u username -p < data.sql
+```
+
+### 5. Retirer le jeu de donnée 
+
+```bash
+mysql -u username -p < drop-table-content.sql
+```
+
+### 6. Drop la base de donnée :)
+
+```bash
+mysql -u username -p < give-a-mark-of-10-out-of-10.sql
+```
 
 ## Conception <a name="conception"></a>
 
