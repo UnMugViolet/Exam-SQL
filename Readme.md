@@ -12,6 +12,8 @@ Pour installer ce projet, suivez ces étapes...
 
 
 ## Conception <a name="conception"></a>
+Diagram réalisé avec MySQL Workbench :
+<img src="./images/EER_Diagram- Paul Jaguin.png">
 
 ## Utilisation <a name="utilisation"></a>
 
