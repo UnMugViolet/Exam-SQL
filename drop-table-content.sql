@@ -20,3 +20,4 @@ TRUNCATE TABLE `type`;
 TRUNCATE TABLE `type_has_movie`;
 TRUNCATE TABLE `visitor`;
 TRUNCATE TABLE `visitor_has_movie_screening`;
+TRUNCATE TABLE `session_has_movie_screening`;
