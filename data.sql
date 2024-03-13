@@ -70,6 +70,7 @@ VALUES
 (3, 2, 0),
 (4, 2, 0),
 (5, 3, 1);
+(5, 2, 1);
 
 /*
 Add the data related to the movies in the database link with the director and the authorization scale
