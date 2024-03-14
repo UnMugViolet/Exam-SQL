@@ -51,8 +51,17 @@ mysql -u username -p < drop-table-content.sql
 mysql -u username -p < give-a-mark-of-10-out-of-10.sql
 ```
 
-## Remarques <a name="remarques"></a>
+### Before importing the CSV file
 
+Open the folder of mysql
+```bash
+xdg-open 	/var/lib/mysql-files/
+```
+
+Paste the csv file in that directory
+
+
+## Remarques <a name="remarques"></a>
 
 #### 1. Changement nature de donnée licence
 La licence est dans une table à part et décomposée en deux colonnes.

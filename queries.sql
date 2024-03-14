@@ -20,6 +20,37 @@ GROUP BY s.slot, s.time
 ORDER BY s.time;
 
 
+-- Import data from csv `movies.csv` into the database
+/*
+In case of restriction from MySQL, you can use the following command to allow the import of data from a file:
+*/
+CREATE TEMPORARY TABLE temp_table
+(
+    Titre VARCHAR(255),
+    `Durée(min)` INT,
+    `Réalisateur·ice` VARCHAR(255),
+    `Acteur·ice` VARCHAR(255),
+    `Année de sortie` DATE,
+    Synopsis TEXT,
+    Commentaire TEXT,
+    `En avant-première` BOOLEAN,
+    `Durée d'exploitation(sem)` INT,
+    Restriction VARCHAR(255),
+    Categories VARCHAR(255)
+);
+SHOW VARIABLES LIKE 'secure_file_priv';
 
+LOAD DATA INFILE '/home/paul/Desktop/Developpement/Exam-SQL/ressources/movies.csv'
+INTO TABLE temp_table
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;
+
+INSERT INTO person (first_name, last_name)
+SELECT DISTINCT SUBSTRING_INDEX(`Réalisateur·ice`, ' ', 1), SUBSTRING_INDEX(`Réalisateur·ice`, ' ', -1)
+
+INSERT INTO movie (title, synopsis, time_duration, release_date, aditional_comment, authorization_scale_id, director_id)
+SELECT t.Titre, t.Synopsis, t.`Durée(min)`, t.`Année de sortie`, t.Commentaire, a.id, d.id
 
 
