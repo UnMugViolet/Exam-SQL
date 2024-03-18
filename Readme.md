@@ -51,14 +51,14 @@ mysql -u username -p < drop-table-content.sql
 mysql -u username -p < give-a-mark-of-10-out-of-10.sql
 ```
 
-### Before importing the CSV file
+### Avant d'importer le CSV
 
-Open the folder of mysql
+Ouvrir le dossier de mysql
 ```bash
-xdg-open 	/var/lib/mysql-files/
+sudo xdg-open /var/lib/mysql-files/
 ```
 
-Paste the csv file in that directory
+Coller le csv dans le dossier de destination
 
 
 ## Remarques <a name="remarques"></a>

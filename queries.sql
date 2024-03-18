@@ -24,7 +24,7 @@ ORDER BY s.time;
 /*
 In case of restriction from MySQL, you can use the following command to allow the import of data from a file:
 */
-CREATE TEMPORARY TABLE temp_table
+CREATE TEMPORARY TABLE temp_table_csv
 (
     Titre VARCHAR(255),
     `Durée(min)` INT,
@@ -34,23 +34,48 @@ CREATE TEMPORARY TABLE temp_table
     Synopsis TEXT,
     Commentaire TEXT,
     `En avant-première` BOOLEAN,
-    `Durée d'exploitation(sem)` INT,
+    `Date début d’exploitation` DATE,
+    `Date de fin d’exploitation` DATE,
     Restriction VARCHAR(255),
     Categories VARCHAR(255)
 );
-SHOW VARIABLES LIKE 'secure_file_priv';
 
-LOAD DATA INFILE '/home/paul/Desktop/Developpement/Exam-SQL/ressources/movies.csv'
-INTO TABLE temp_table
+LOAD DATA INFILE '/var/lib/mysql-files/movies.csv'
+INTO TABLE temp_table_csv
 FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS;
 
-INSERT INTO person (first_name, last_name)
-SELECT DISTINCT SUBSTRING_INDEX(`Réalisateur·ice`, ' ', 1), SUBSTRING_INDEX(`Réalisateur·ice`, ' ', -1)
+-- Stored procedure to explode the name into two columns
+DELIMITER //
+CREATE PROCEDURE insert_into_person()
+BEGIN
+    -- Insert data into the person table, splitting the name into first and last name
+    INSERT INTO person (first_name, last_name)
+    SELECT 
+        SUBSTRING_INDEX(Réalisateur·ice, ' ', 1) AS first_name,
+        CASE WHEN INSTR(Réalisateur·ice, ' ') > 0 
+             THEN SUBSTRING_INDEX(Réalisateur·ice, ' ', -1)
+             ELSE NULL 
+        END AS last_name
+    FROM temp_table_person_distinct;
+END;
+DELIMITER ;
 
-INSERT INTO movie (title, synopsis, time_duration, release_date, aditional_comment, authorization_scale_id, director_id)
-SELECT t.Titre, t.Synopsis, t.`Durée(min)`, t.`Année de sortie`, t.Commentaire, a.id, d.id
+-- Show data from the temporary table
+SELECT * FROM temp_table_csv;
 
+SELECT `Réalisateur·ice` FROM temp_table_csv;
 
+-- Select distinct rows from the temporary table
+CREATE TEMPORARY TABLE temp_table_person_distinct AS
+SELECT DISTINCT `Réalisateur·ice` FROM temp_table_csv;
+
+-- Insert film director into the person table, splitting the name into first and last name
+CALL insert_into_person();
+
+-- Drop the temporary table holding distinct values
+DROP TEMPORARY TABLE IF EXISTS temp_table_person_distinct;
+
+DROP TEMPORARY TABLE IF EXISTS temp_table_csv;
