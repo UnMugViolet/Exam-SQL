@@ -81,7 +81,7 @@ VALUES
 (2, 'Le Seigneur des Anneaux : Les deux tours', 'Après la mort de Boromir et la disparition de Gandalf,  la Communauté s\'est scindée en trois. Perdus dans les collines d`\'Emyn Muil  Frodon et Sam découvrent qu\'ils sont suivis par Gollum  une créature versatile corrompue par l\'Anneau etc.', '179', '2002-12-18', 'Rétrospective', 1, 1),
 (3, 'Le Seigneur des Anneaux : Le retour du roi', 'Les armées de Sauron ont attaqué Minas Tirith, la capitale de Gondor. Jamais ce royaume autrefois puissant n\'a eu autant besoin de son roi. Mais Aragorn trouvera-t-il en lui la volonté d\'accomplir sa destinée ?', '201', '2003-12-01', 'Rétrospective', 1, 1),
 (4, 'Les chambres rouges', 'Deux jeunes femmes se réveillent chaque matin aux portes du palais de justice pour pouvoir assister au procès hypermédiatisé', '118', '2024-01-17', NULL, 2, 2),
-(5, 'Anatomie d\'une chute', 'Sandra, Samuel et leur fils malvoyant de 11 ans, Daniel, vivent depuis un an loin de tout, à la montagne. Un jour, Samuel est etc.', '150', '2023-09-23', 'Coup de coeur', 0, 3);
+(5, 'Anatomie d\'une chute', 'Sandra, Samuel et leur fils malvoyant de 11 ans, Daniel, vivent depuis un an loin de tout, à la montagne. Un jour, Samuel est etc.', '150', '2023-09-23', 'Coup de coeur', 1, 3);
 
 /*
 Add the data for movie screening
