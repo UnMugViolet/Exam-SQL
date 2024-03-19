@@ -1,4 +1,7 @@
--- Create a view for weekday cinema room reserved sessions
+------------------------------------------------------------
+-- 1. Create views for the cinema room reserved sessions plan
+------------------------------------------------------------
+
 /* This method is creating a vue, it concatenates multiple thing, first the string and the number of the cinea room. 
 Second Groud concat is used to group the results in the same cell. 
 Records are separated in a comma then space */
@@ -19,8 +22,10 @@ JOIN cinema_room cr ON shms.cinema_room_id = cr.id
 GROUP BY s.slot, s.time
 ORDER BY s.time;
 
+------------------------------------------------------------
+-- 2. 3. Import data from csv `movies.csv` into the database
+------------------------------------------------------------
 
--- Import data from csv `movies.csv` into the database
 /*
 In case of restriction from MySQL, you can use the following command to allow the import of data from a file:
 */
@@ -102,4 +107,94 @@ DROP TEMPORARY TABLE IF EXISTS temp_table_movie;
 
 -- Drop the main table responsible of the global import
 DROP TEMPORARY TABLE IF EXISTS temp_table_csv;
+
+--------------------------------------------------------------
+-- 4. Request the movie per director order by date of release
+--------------------------------------------------------------
+SELECT m.title
+FROM movie m
+JOIN director d ON m.director_id = d.id
+JOIN person p ON d.person_id = p.id
+WHERE p.first_name = 'Peter' AND p.last_name = 'Jackson'
+ORDER BY m.release_date;
+
+--------------------------------------------------------------
+-- 5. Request the movie where Viggo Mortensen is an actor 
+--------------------------------------------------------------
+SELECT m.title, p.first_name, p.last_name
+FROM movie m
+JOIN actor_has_movie am ON m.id = am.movie_id
+JOIN actor a ON am.actor_id = a.id
+JOIN person p ON a.person_id = p.id
+WHERE p.first_name = 'Viggo' AND p.last_name = 'Mortensen';
+
+--------------------------------------------------------------
+-- 6. Request the movie where Viggo Mortensen and Ian McKellen are actors
+--------------------------------------------------------------
+
+SELECT m.title
+FROM movie m
+JOIN actor_has_movie am ON m.id = am.movie_id
+JOIN actor a ON am.actor_id = a.id
+JOIN person p ON a.person_id = p.id
+WHERE (p.first_name = 'Viggo' AND p.last_name = 'Mortensen') OR 
+      (p.first_name = 'Ian' AND p.last_name = 'McKellen')
+GROUP BY m.id, m.title
+HAVING COUNT(DISTINCT p.id) = 2;
+
+
+--------------------------------------------------------------
+-- 7. Transform time duration from minutes in hours and minutes
+--------------------------------------------------------------
+
+DELIMITER //
+CREATE FUNCTION format_movie_duration(duration_in_min INT) 
+RETURNS VARCHAR(255)
+DETERMINISTIC
+NO SQL
+BEGIN
+    DECLARE hours INT;
+    DECLARE minutes INT;
+    SET hours = FLOOR(duration_in_min / 60);
+    SET minutes = MOD(duration_in_min, 60);
+    RETURN CONCAT(hours, 'h', LPAD(minutes, 2, '0'));
+END//
+DELIMITER ;
+
+SELECT format_movie_duration(133);
+
+--------------------------------------------------------------
+-- 8. Display complete record of the movie Anatomie d'une chute
+--------------------------------------------------------------
+
+SELECT 
+    m.title AS 'Title',
+    m.synopsis AS 'Synopsis',
+    CONCAT(p1.first_name, ' ', p1.last_name) AS 'Director',
+    GROUP_CONCAT(DISTINCT CONCAT(p2.first_name, ' ', p2.last_name) SEPARATOR ', ') AS 'Actors',
+    format_movie_duration(m.time_duration) AS 'Duration',
+    GROUP_CONCAT(DISTINCT t.label SEPARATOR ', ') AS 'Genres',
+    m.aditional_comment AS 'Comment'
+FROM 
+    movie m
+JOIN 
+    director d ON m.director_id = d.id
+JOIN 
+    person p1 ON d.person_id = p1.id
+JOIN 
+    actor_has_movie am ON m.id = am.movie_id
+JOIN 
+    actor a ON am.actor_id = a.id
+JOIN 
+    person p2 ON a.person_id = p2.id
+JOIN 
+    type_has_movie tm ON m.id = tm.movie_id
+JOIN 
+    type t ON tm.type_id = t.id
+JOIN 
+    authorization_scale a_s ON m.authorization_scale_id = a_s.id
+WHERE 
+    m.id = 5
+GROUP BY 
+    m.id;
 

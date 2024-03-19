@@ -60,6 +60,7 @@ sudo xdg-open /var/lib/mysql-files/
 
 Coller le csv dans le dossier de destination
 
+Puis executer les 
 
 ## Remarques <a name="remarques"></a>
 
