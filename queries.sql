@@ -26,18 +26,19 @@ In case of restriction from MySQL, you can use the following command to allow th
 */
 CREATE TEMPORARY TABLE temp_table_csv
 (
-    Titre VARCHAR(255),
+    `Titre` VARCHAR(255),
     `Durée(min)` INT,
     `Réalisateur·ice` VARCHAR(255),
     `Acteur·ice` VARCHAR(255),
     `Année de sortie` DATE,
-    Synopsis TEXT,
-    Commentaire TEXT,
+    `Synopsis` TEXT,
+    `Commentaire` TEXT,
     `En avant-première` BOOLEAN,
     `Date début d’exploitation` DATE,
     `Date de fin d’exploitation` DATE,
-    Restriction VARCHAR(255),
-    Categories VARCHAR(255)
+    `Restriction` VARCHAR(255),
+    `Réalisateur·ice ID` INT,
+    `Catégories` VARCHAR(255)
 );
 
 LOAD DATA INFILE '/var/lib/mysql-files/movies.csv'
@@ -47,35 +48,58 @@ ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS;
 
--- Stored procedure to explode the name into two columns
-DELIMITER //
-CREATE PROCEDURE insert_into_person()
-BEGIN
-    -- Insert data into the person table, splitting the name into first and last name
-    INSERT INTO person (first_name, last_name)
-    SELECT 
-        SUBSTRING_INDEX(Réalisateur·ice, ' ', 1) AS first_name,
-        CASE WHEN INSTR(Réalisateur·ice, ' ') > 0 
-             THEN SUBSTRING_INDEX(Réalisateur·ice, ' ', -1)
-             ELSE NULL 
-        END AS last_name
-    FROM temp_table_person_distinct;
-END;
-DELIMITER ;
-
 -- Show data from the temporary table
 SELECT * FROM temp_table_csv;
 
-SELECT `Réalisateur·ice` FROM temp_table_csv;
-
--- Select distinct rows from the temporary table
+/*
+Start logic for importing the data regarding the movie directors
+That code is creating a temporary table to store the distinct values of the directors. 
+Then it is inserting the data into the person table, splitting the name into first and last name. 
+Finally, it is dropping the temporary table holding distinct values
+*/
 CREATE TEMPORARY TABLE temp_table_person_distinct AS
 SELECT DISTINCT `Réalisateur·ice` FROM temp_table_csv;
 
--- Insert film director into the person table, splitting the name into first and last name
-CALL insert_into_person();
+-- Insert data into the person table, splitting the name into first and last name
+INSERT INTO person (first_name, last_name)
+SELECT 
+    SUBSTRING_INDEX(Réalisateur·ice, ' ', 1) AS first_name,
+    CASE WHEN INSTR(Réalisateur·ice, ' ') > 0 
+            THEN SUBSTRING_INDEX(Réalisateur·ice, ' ', -1)
+            ELSE NULL 
+    END AS last_name
+FROM temp_table_person_distinct;
 
--- Drop the temporary table holding distinct values
+-- Drop the temporary table holding distinct values of film directors
 DROP TEMPORARY TABLE IF EXISTS temp_table_person_distinct;
 
+/* 
+Start logic for importing the data regarding the movie into the movie table
+*/
+CREATE TEMPORARY TABLE temp_table_movie AS
+SELECT DISTINCT `Titre`, `Durée(min)`, `Année de sortie`, `Synopsis`, `Commentaire`, `Restriction`, `Réalisateur·ice ID` FROM temp_table_csv;
+
+-- Show data from the temporary table importing the movies
+SELECT * FROM temp_table_movie;
+-- Insert data related to movie into the movie table
+INSERT INTO movie (title, synopsis, time_duration, release_date, aditional_comment, authorization_scale_id, director_id)
+SELECT 
+    `Titre` AS title,
+    `Synopsis` AS synopsis,
+    `Durée(min)` AS time_duration,
+    `Année de sortie` AS release_date,
+    `Commentaire` AS aditional_comment,
+    CASE 
+        WHEN `Restriction` = 'Tout public' THEN 1
+        WHEN `Restriction` = 'Interdit aux moins de douze ans' THEN 2
+        WHEN `Restriction` = 'Interdit aux moins de seize ans' THEN 3
+        WHEN `Restriction` = 'Interdit aux mineurs' THEN 4
+        ELSE NULL
+    END AS authorization_scale_id,
+    `Réalisateur·ice ID` AS director_id
+FROM temp_table_movie;
+DROP TEMPORARY TABLE IF EXISTS temp_table_movie;
+
+-- Drop the main table responsible of the global import
 DROP TEMPORARY TABLE IF EXISTS temp_table_csv;
+
