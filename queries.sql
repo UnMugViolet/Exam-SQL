@@ -166,7 +166,7 @@ SELECT format_movie_duration(133);
 --------------------------------------------------------------
 -- 8. Display complete record of the movie Anatomie d'une chute
 --------------------------------------------------------------
-
+CREATE VIEW movie_summary AS
 SELECT 
     m.title AS 'Title',
     m.synopsis AS 'Synopsis',
@@ -198,3 +198,152 @@ WHERE
 GROUP BY 
     m.id;
 
+
+--------------------------------------------------------------
+-- 9. Create stored procedure to display summary of a movie
+--------------------------------------------------------------
+
+DELIMITER //
+CREATE PROCEDURE movie_summary(IN movie_id INT)
+BEGIN
+    SELECT 
+        m.title AS 'Title',
+        m.synopsis AS 'Synopsis',
+        CONCAT(p1.first_name, ' ', p1.last_name) AS 'Director',
+        GROUP_CONCAT(DISTINCT CONCAT(p2.first_name, ' ', p2.last_name) SEPARATOR ', ') AS 'Actors',
+        format_movie_duration(m.time_duration) AS 'Duration',
+        GROUP_CONCAT(DISTINCT t.label SEPARATOR ', ') AS 'Genres',
+        m.aditional_comment AS 'Comment'
+    FROM 
+        movie m
+    JOIN 
+        director d ON m.director_id = d.id
+    JOIN 
+        person p1 ON d.person_id = p1.id
+    JOIN 
+        actor_has_movie am ON m.id = am.movie_id
+    JOIN 
+        actor a ON am.actor_id = a.id
+    JOIN 
+        person p2 ON a.person_id = p2.id
+    JOIN 
+        type_has_movie tm ON m.id = tm.movie_id
+    JOIN 
+        type t ON tm.type_id = t.id
+    JOIN 
+        authorization_scale a_s ON m.authorization_scale_id = a_s.id
+    WHERE 
+        m.id = movie_id
+    GROUP BY 
+        m.id;
+END//
+DELIMITER ;
+
+-- Call the stored procedure to display the summary of the movie by id
+CALL movie_summary(2);
+
+--------------------------------------------------------------
+-- 10. Create prepared statement to plan the sessions of a movie
+--------------------------------------------------------------
+
+-- Program "Le Seigneur des Anneaux : la communauté de l’anneau" in VF on all "Matin" sessions in "Salle 01"
+INSERT INTO movie_screening (movie_id, language_id, session_has_movie_screening_session_id, session_has_movie_screening_cinema_room_id, is_preview, day_screening_id)
+SELECT 
+    (SELECT id FROM movie WHERE title = "Le Seigneur des Anneaux : La communauté de l'anneau") AS movie_id,
+    (SELECT id FROM language WHERE label = 'VF') AS language_id,
+    1,
+    (SELECT id FROM cinema_room WHERE name = '01') AS cinema_room_id,
+    0 AS is_preview,
+    1 AS day_screening_id -- Constraint here due to DB creation, real case would be to create in the mean time the days where this screening occurs
+FROM 
+    session
+WHERE 
+    slot = 'Matin';
+
+-- Program "Anatomie d’une chute" in VF on all "Après-Midi 2" weekday sessions and "Soirée" weekend sessions in "Salle 03"
+INSERT INTO movie_screening (movie_id, language_id, session_has_movie_screening_session_id, session_has_movie_screening_cinema_room_id, is_preview, day_screening_id)
+SELECT 
+    (SELECT id FROM movie WHERE title = "Anatomie d'une chute") AS movie_id,
+    (SELECT id FROM language WHERE label = 'VF') AS language_id,
+    s.id AS session_id,
+    (SELECT id FROM cinema_room WHERE name = '03') AS cinema_room_id,
+    0 AS is_preview,
+    1 AS day_screening_id -- Constraint here due to DB creation, real case would be to create in the mean time the days where this screening occurs
+FROM 
+    session_has_movie_screening shms
+JOIN 
+    session s ON shms.session_id = s.id
+WHERE 
+    (s.slot = 'Après-Midi 2' AND shms.is_weekday = 1) OR (s.slot = 'Soirée' AND shms.is_weekday = 0);
+
+--------------------------------------------------------------
+-- 11. List the movie screenings of the movies during the week
+--------------------------------------------------------------
+SELECT 
+    m.title AS 'Movie Title',
+    l.label AS 'Language',
+    s.slot AS 'Session',
+    cr.name AS 'Cinema Room',
+    ms.is_preview AS 'Is Preview',
+    ds.id AS 'Day Screening ID'
+FROM 
+    movie_screening ms
+JOIN 
+    movie m ON ms.movie_id = m.id
+JOIN 
+    language l ON ms.language_id = l.id
+JOIN 
+    session s ON ms.session_has_movie_screening_session_id = s.id
+JOIN 
+    cinema_room cr ON ms.session_has_movie_screening_cinema_room_id = cr.id
+JOIN 
+    day_screening ds ON ms.day_screening_id = ds.id
+WHERE 
+    ds.id IN (1, 2, 3)
+ORDER BY ds.id, s.time;
+
+--------------------------------------------------------------
+-- 12. Register two seats 
+--------------------------------------------------------------
+INSERT INTO visitor_has_movie_screening (visitor_id, movie_screening_id, price_category_id)
+VALUES 
+    ((SELECT id FROM person WHERE id BETWEEN 11 AND 15 LIMIT 1), 
+    (SELECT ms.id FROM movie_screening ms 
+    JOIN movie m ON ms.movie_id = m.id 
+    JOIN session s ON ms.session_has_movie_screening_session_id = s.id 
+    JOIN day_screening ds ON ms.day_screening_id = ds.id 
+    WHERE m.title = "Le Seigneur des Anneaux : La communauté de l'anneau" 
+    AND s.time = '10:00:00' 
+    AND ds.date = '2022-02-27' LIMIT 1), 
+    (SELECT id FROM price_category WHERE label = 'Tarif plein')),
+    ((SELECT id FROM person WHERE id BETWEEN 11 AND 15 AND id NOT IN (SELECT visitor_id FROM visitor) LIMIT 1), 
+    (SELECT ms.id FROM movie_screening ms 
+    JOIN movie m ON ms.movie_id = m.id 
+    JOIN session s ON ms.session_has_movie_screening_session_id = s.id 
+    JOIN day_screening ds ON ms.day_screening_id = ds.id 
+    WHERE m.title = "Le Seigneur des Anneaux : La communauté de l'anneau"
+    AND s.time = '10:00:00' 
+    AND ds.date = '2022-02-27' LIMIT 1), 
+    (SELECT id FROM price_category WHERE label = 'Tarif demandeur d’emploi'));
+
+-- Display the two tickets
+SELECT 
+    v.visitor_id AS 'Visitor ID',
+    m.title AS 'Movie Title',
+    s.time AS 'Session Time',
+    ds.date AS 'Screening Date',
+    pc.label AS 'Price Category'
+FROM 
+    visitor v
+JOIN 
+    movie_screening ms ON v.movie_screening_id = ms.id
+JOIN 
+    movie m ON ms.movie_id = m.id
+JOIN 
+    session s ON ms.session_has_movie_screening_session_id = s.id
+JOIN 
+    day_screening ds ON ms.day_screening_id = ds.id
+JOIN 
+    price_category pc ON v.price_category_id = pc.id
+WHERE 
+    v.visitor_id IN (SELECT id FROM person WHERE id BETWEEN 11 AND 15);
