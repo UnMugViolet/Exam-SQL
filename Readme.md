@@ -33,6 +33,12 @@ mysql -u username -p < schema.sql
 mysql -u username -p < data.sql
 ```
 
+### 5. Créer toute les queries en une fois
+
+```bash
+mysql -u username -p < queries.sql
+```
+
 ## Conception <a name="conception"></a>
 Diagram réalisé avec MySQL Workbench :
 <img src="./images/EER_Diagram- Paul Jaguin.png">
