@@ -317,12 +317,14 @@ VALUES (
                 JOIN movie m ON ms.movie_id = m.id
                 JOIN session s ON ms.session_has_movie_screening_session_id = s.id
                 JOIN day_screening ds ON ms.day_screening_id = ds.id
+                JOIN cinema_room cr ON ms.session_has_movie_screening_cinema_room_id = cr.id
                 JOIN language l ON ms.language_id = l.id
             WHERE
                 m.id = 1
                 AND s.time = '10:00:00'
                 AND ds.date = '2024-03-10'
                 AND l.label = 'VF'
+                AND cr.name = '01'
         ), (
             SELECT id
             FROM price_category
@@ -338,12 +340,14 @@ VALUES (
                 JOIN movie m ON ms.movie_id = m.id
                 JOIN session s ON ms.session_has_movie_screening_session_id = s.id
                 JOIN day_screening ds ON ms.day_screening_id = ds.id
+                JOIN cinema_room cr ON ms.session_has_movie_screening_cinema_room_id = cr.id
                 JOIN language l ON ms.language_id = l.id
             WHERE
                 m.id = 1
                 AND s.time = '10:00:00'
                 AND ds.date = '2024-03-10'
                 AND l.label = 'VF'
+                AND cr.name = '01'
         ), (
             SELECT id
             FROM price_category
@@ -362,7 +366,8 @@ SELECT
     s.time AS 'Session Time',
     ds.date AS 'Screening Date',
     l.label AS 'Language',
-    pc.label AS 'Price Category'
+    pc.label AS 'Price Category',
+    cr.name AS 'Cinema Room'
 FROM 
     visitor_has_movie_screening vhm
 LEFT JOIN 
@@ -377,6 +382,7 @@ LEFT JOIN
     language l ON ms.language_id = l.id
 LEFT JOIN 
     price_category pc ON vhm.price_category_id = pc.id
+JOIN
+    cinema_room cr ON ms.session_has_movie_screening_cinema_room_id = cr.id
 WHERE 
     vhm.visitor_id IN (11, 12);
-
