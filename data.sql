@@ -60,17 +60,6 @@ VALUES
 ('20:00:00', 'Soirée'),
 ('22:00:00', 'Nuit');
 
-/*
-Add some sessions to the cinema room
-*/
-INSERT INTO `session_has_movie_screening` (`session_id`, `cinema_room_id`, `is_weekday`)
-VALUES
-(1, 1, 0),
-(2, 1, 0),
-(3, 2, 0),
-(4, 2, 0),
-(5, 3, 1),
-(5, 2, 1);
 
 /*
 Add the data related to the movies in the database link with the director and the authorization scale
@@ -205,23 +194,12 @@ VALUES
 (5, 13);
 
 /*
-Add visitor to screening with price
-*/
-INSERT INTO `visitor_has_movie_screening` (`visitor_id`, `movie_screening_id`, `price_category_id`)
-VALUES
-(11, 1, 1),
-(12, 2, 2),
-(13, 3, 3),
-(14, 4, 4),
-(15, 5, 1);
-
-/*
 Add day_screening programmation
 */
 INSERT INTO `day_screening` (`date`)
 VALUES
 ('2024-03-10'),
 ('2024-03-09'), 
-('2022-02-27')
+('2022-02-27'),
 ('2024-03-11');
 
