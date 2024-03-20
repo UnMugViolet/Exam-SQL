@@ -386,3 +386,27 @@ JOIN
     cinema_room cr ON ms.session_has_movie_screening_cinema_room_id = cr.id
 WHERE 
     vhm.visitor_id IN (11, 12);
+
+
+--------------------------------------------------------------
+-- 13. Request number of seats available for a movie screening
+--------------------------------------------------------------
+SELECT 
+    ds.date AS 'Screening Date',
+    s.time AS 'Session Time',
+    cr.name AS 'Cinema Room',
+    cr.max_capacity - COUNT(vhm.visitor_id) AS 'Remaining Seats'
+FROM 
+    cinema_room cr
+LEFT JOIN 
+    movie_screening ms ON cr.id = ms.session_has_movie_screening_cinema_room_id
+LEFT JOIN 
+    visitor_has_movie_screening vhm ON ms.id = vhm.movie_screening_id
+LEFT JOIN 
+    session s ON ms.session_has_movie_screening_session_id = s.id
+LEFT JOIN 
+    day_screening ds ON ms.day_screening_id = ds.id
+WHERE 
+    s.time = '10:00:00' AND ds.date = '2024-03-10'
+GROUP BY 
+    cr.name, cr.max_capacity;
