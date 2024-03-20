@@ -60,7 +60,10 @@ sudo xdg-open /var/lib/mysql-files/
 
 Coller le csv dans le dossier de destination
 
-Puis executer les 
+Puis executer les commandes du fichier queries.sql
+
+⚠️ Le fichier csv a été modifier pour correspondre à la base de donnée et les modifications faites dans les remarques. Il est important d'importer le fichier csv du repo et non celui général (possible d'en savoir plus sur [remarque 3](#remarques))
+
 
 ## Remarques <a name="remarques"></a>
 
@@ -75,3 +78,9 @@ Dans notre cas cela se matérialise par le fait qu'on ne puisse pas se baser sur
 La table visiteur est inutile car la gestion de vente de tickets se fait uniquement en présentiel. 
 Elle est tout de même utile pour déterminer la capacité maximale de la salle. 
 Le fait de la créer maintenant a pour avantage de rendre la base de donnée plus modulaire, dans le sens où il suffira de rajouter les colonnes gérant la reservation dans visiteur pour pouvoir avoir une vente en ligne par visiteur. 
+
+#### 3. Modification du fichier CSV
+Certaines cellules ont été rentrées avec des espaces en début de texte, pour séparer le nom et le prénom il a fallu retirer ces derniers. 
+L'ID du directeur a été rajoutée car il est compliqué d'imaginer une querie qui comprend tous les  directeurs de film et traduit ces derniers avec leur id. (il était possible de le faire avec l'exercice car peut de réalisateur mais avec plus de 20 différents par exemple, il est difficile d'envisager cette solution)
+
+
