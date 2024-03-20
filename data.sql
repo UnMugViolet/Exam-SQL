@@ -37,7 +37,7 @@ INSERT INTO `price_category` (`label`, `price`)
 VALUES
 ('Tarif plein', 980),
 ('Tarif étudiant', 500),
-('Tarif Demandeur d''emploi', 500),
+('Tarif demandeur d''emploi', 500),
 ('Tarif -14 ans', 380);
 
 /*

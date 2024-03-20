@@ -305,45 +305,77 @@ ORDER BY ds.id, s.time;
 --------------------------------------------------------------
 -- 12. Register two seats 
 --------------------------------------------------------------
-INSERT INTO visitor_has_movie_screening (visitor_id, movie_screening_id, price_category_id)
-VALUES 
-    ((SELECT id FROM person WHERE id BETWEEN 11 AND 15 LIMIT 1), 
-    (SELECT ms.id FROM movie_screening ms 
-    JOIN movie m ON ms.movie_id = m.id 
-    JOIN session s ON ms.session_has_movie_screening_session_id = s.id 
-    JOIN day_screening ds ON ms.day_screening_id = ds.id 
-    WHERE m.title = "Le Seigneur des Anneaux : La communauté de l'anneau" 
-    AND s.time = '10:00:00' 
-    AND ds.date = '2022-02-27' LIMIT 1), 
-    (SELECT id FROM price_category WHERE label = 'Tarif plein')),
-    ((SELECT id FROM person WHERE id BETWEEN 11 AND 15 AND id NOT IN (SELECT visitor_id FROM visitor) LIMIT 1), 
-    (SELECT ms.id FROM movie_screening ms 
-    JOIN movie m ON ms.movie_id = m.id 
-    JOIN session s ON ms.session_has_movie_screening_session_id = s.id 
-    JOIN day_screening ds ON ms.day_screening_id = ds.id 
-    WHERE m.title = "Le Seigneur des Anneaux : La communauté de l'anneau"
-    AND s.time = '10:00:00' 
-    AND ds.date = '2022-02-27' LIMIT 1), 
-    (SELECT id FROM price_category WHERE label = 'Tarif demandeur d’emploi'));
+INSERT INTO
+    visitor_has_movie_screening (
+        visitor_id, movie_screening_id, price_category_id
+    )
+VALUES (
+        11, (
+            SELECT ms.id
+            FROM
+                movie_screening ms
+                JOIN movie m ON ms.movie_id = m.id
+                JOIN session s ON ms.session_has_movie_screening_session_id = s.id
+                JOIN day_screening ds ON ms.day_screening_id = ds.id
+                JOIN language l ON ms.language_id = l.id
+            WHERE
+                m.id = 1
+                AND s.time = '10:00:00'
+                AND ds.date = '2024-03-10'
+                AND l.label = 'VF'
+        ), (
+            SELECT id
+            FROM price_category
+            WHERE
+                label = 'Tarif plein'
+        )
+    ),
+    (
+        12, (
+            SELECT ms.id
+            FROM
+                movie_screening ms
+                JOIN movie m ON ms.movie_id = m.id
+                JOIN session s ON ms.session_has_movie_screening_session_id = s.id
+                JOIN day_screening ds ON ms.day_screening_id = ds.id
+                JOIN language l ON ms.language_id = l.id
+            WHERE
+                m.id = 1
+                AND s.time = '10:00:00'
+                AND ds.date = '2024-03-10'
+                AND l.label = 'VF'
+        ), (
+            SELECT id
+            FROM price_category
+            WHERE
+                label = "Tarif demandeur d'emploi" 
+        )
+    );
 
 -- Display the two tickets
 SELECT 
-    v.visitor_id AS 'Visitor ID',
+    vhm.visitor_id,
+    vhm.movie_screening_id,
+    vhm.price_category_id,
     m.title AS 'Movie Title',
     s.time AS 'Session Time',
     ds.date AS 'Screening Date',
+    l.label AS 'Language',
     pc.label AS 'Price Category'
 FROM 
-    visitor v
-JOIN 
-    movie_screening ms ON v.movie_screening_id = ms.id
-JOIN 
+    visitor_has_movie_screening vhm
+LEFT JOIN 
+    movie_screening ms ON vhm.movie_screening_id = ms.id
+LEFT JOIN 
     movie m ON ms.movie_id = m.id
-JOIN 
+LEFT JOIN 
     session s ON ms.session_has_movie_screening_session_id = s.id
-JOIN 
+LEFT JOIN 
     day_screening ds ON ms.day_screening_id = ds.id
-JOIN 
-    price_category pc ON v.price_category_id = pc.id
+LEFT JOIN 
+    language l ON ms.language_id = l.id
+LEFT JOIN 
+    price_category pc ON vhm.price_category_id = pc.id
 WHERE 
-    v.visitor_id IN (SELECT id FROM person WHERE id BETWEEN 11 AND 15);
+    vhm.visitor_id IN (11, 12);
+
