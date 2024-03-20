@@ -1,6 +1,8 @@
-------------------------------------------------------------
+/*
 -- 1. Create views for the cinema room reserved sessions plan
-------------------------------------------------------------
+*/
+
+USE `exam_sql_paul_jaguin`;
 
 /* This method is creating a vue, it concatenates multiple thing, first the string and the number of the cinea room. 
 Second Groud concat is used to group the results in the same cell. 
@@ -22,9 +24,9 @@ JOIN cinema_room cr ON shms.cinema_room_id = cr.id
 GROUP BY s.slot, s.time
 ORDER BY s.time;
 
-------------------------------------------------------------
+/*
 -- 2. 3. Import data from csv `movies.csv` into the database
-------------------------------------------------------------
+*/
 
 /*
 In case of restriction from MySQL, you can use the following command to allow the import of data from a file:
@@ -108,9 +110,9 @@ DROP TEMPORARY TABLE IF EXISTS temp_table_movie;
 -- Drop the main table responsible of the global import
 DROP TEMPORARY TABLE IF EXISTS temp_table_csv;
 
---------------------------------------------------------------
+/*
 -- 4. Request the movie per director order by date of release
---------------------------------------------------------------
+*/
 SELECT m.title
 FROM movie m
 JOIN director d ON m.director_id = d.id
@@ -118,9 +120,9 @@ JOIN person p ON d.person_id = p.id
 WHERE p.first_name = 'Peter' AND p.last_name = 'Jackson'
 ORDER BY m.release_date;
 
---------------------------------------------------------------
+/*
 -- 5. Request the movie where Viggo Mortensen is an actor 
---------------------------------------------------------------
+*/
 SELECT m.title, p.first_name, p.last_name
 FROM movie m
 JOIN actor_has_movie am ON m.id = am.movie_id
@@ -128,9 +130,9 @@ JOIN actor a ON am.actor_id = a.id
 JOIN person p ON a.person_id = p.id
 WHERE p.first_name = 'Viggo' AND p.last_name = 'Mortensen';
 
---------------------------------------------------------------
+/*
 -- 6. Request the movie where Viggo Mortensen and Ian McKellen are actors
---------------------------------------------------------------
+*/
 
 SELECT m.title
 FROM movie m
@@ -143,9 +145,9 @@ GROUP BY m.id, m.title
 HAVING COUNT(DISTINCT p.id) = 2;
 
 
---------------------------------------------------------------
+/*
 -- 7. Transform time duration from minutes in hours and minutes
---------------------------------------------------------------
+*/
 
 DELIMITER //
 CREATE FUNCTION format_movie_duration(duration_in_min INT) 
@@ -163,9 +165,9 @@ DELIMITER ;
 
 SELECT format_movie_duration(133);
 
---------------------------------------------------------------
+/*
 -- 8. Display complete record of the movie Anatomie d'une chute
---------------------------------------------------------------
+*/
 CREATE VIEW movie_summary AS
 SELECT 
     m.title AS 'Title',
@@ -199,9 +201,9 @@ GROUP BY
     m.id;
 
 
---------------------------------------------------------------
+/*
 -- 9. Create stored procedure to display summary of a movie
---------------------------------------------------------------
+*/
 
 DELIMITER //
 CREATE PROCEDURE movie_summary(IN movie_id INT)
@@ -242,9 +244,9 @@ DELIMITER ;
 -- Call the stored procedure to display the summary of the movie by id
 CALL movie_summary(2);
 
---------------------------------------------------------------
+/*
 -- 10. Create prepared statement to plan the sessions of a movie
---------------------------------------------------------------
+*/
 
 -- Program "Le Seigneur des Anneaux : la communauté de l’anneau" in VF on all "Matin" sessions in "Salle 01"
 INSERT INTO movie_screening (movie_id, language_id, session_has_movie_screening_session_id, session_has_movie_screening_cinema_room_id, is_preview, day_screening_id)
@@ -276,9 +278,9 @@ JOIN
 WHERE 
     (s.slot = 'Après-Midi 2' AND shms.is_weekday = 1) OR (s.slot = 'Soirée' AND shms.is_weekday = 0);
 
---------------------------------------------------------------
+/*
 -- 11. List the movie screenings of the movies during the week
---------------------------------------------------------------
+*/
 SELECT 
     m.title AS 'Movie Title',
     l.label AS 'Language',
@@ -302,9 +304,9 @@ WHERE
     ds.id IN (1, 2, 3)
 ORDER BY ds.id, s.time;
 
---------------------------------------------------------------
+/*
 -- 12. Register two seats 
---------------------------------------------------------------
+*/
 INSERT INTO
     visitor_has_movie_screening (
         visitor_id, movie_screening_id, price_category_id
@@ -388,9 +390,9 @@ WHERE
     vhm.visitor_id IN (11, 12);
 
 
---------------------------------------------------------------
+/*
 -- 13. Request number of seats available for a movie screening
---------------------------------------------------------------
+*/
 SELECT 
     ds.date AS 'Screening Date',
     s.time AS 'Session Time',
