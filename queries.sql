@@ -352,6 +352,7 @@ VALUES (
         )
     );
 
+
 -- Display the two tickets
 SELECT 
     vhm.visitor_id,
