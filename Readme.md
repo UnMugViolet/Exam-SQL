@@ -68,7 +68,7 @@ Coller le csv dans le dossier de destination
 
 Puis éxecuter les commandes du fichier queries.sql
 
-⚠️ Le fichier csv a été modifier pour correspondre à la base de donnée et les modifications faites dans les remarques. Il est important d'importer le fichier csv du repo et non celui général (possible d'en savoir plus sur [remarque 3](#remarques))
+⚠️ Le fichier csv a été modifié pour correspondre à la base de donnée et les modifications faites dans les remarques. Il est important d'importer le fichier csv du repo et non celui général (possible d'en savoir plus sur [remarque 3](#remarques))
 
 
 ## Remarques <a name="remarques"></a>
